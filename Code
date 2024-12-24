@@ -1,0 +1,73 @@
+def add_time(start, duration, start_day=None):
+    # Parsing the Start Time
+    start_parts = start.split()
+    time_parts = start_parts[0].split(':')
+    start_hour = int(time_parts[0])
+    start_minute = int(time_parts[1])
+    period = start_parts[1]
+
+    # Converting to 24-hour format
+    if period != 12 and period == 'PM':
+        start_hour += 12
+    elif period == 12 and period == 'AM':
+        start_hour = 0
+
+    # Parsing the Duration Time
+    duration_parts = duration.split(':')
+    duration_hour = int(duration_parts[0])
+    duration_minute = int(duration_parts[1])
+
+    # Adding the Duration to the Start Time
+    final_minute = start_minute + duration_minute
+    extra_hour = final_minute // 60
+    final_minute %= 60
+
+    final_hour = start_hour + duration_hour + extra_hour
+    days_later = final_hour // 24
+    final_hour %= 24
+
+    # Converting Back to 12-hour Format
+    if final_hour == 0:
+        display_hour = 12
+        display_period = 'AM'
+    elif final_hour < 12:
+        display_hour = final_hour
+        display_period = 'AM'
+    elif final_hour == 12:
+        display_hour = 12
+        display_period = 'PM'
+    else:
+        display_hour = final_hour - 12
+        display_period = 'PM'
+
+    # Handling the Days of the Week (if provided)
+    days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    if start_day:
+        start_day_index = days_of_week.index(start_day.capitalize())
+        result_day_index = (start_day_index + days_later) % 7
+        result_day = days_of_week[result_day_index]
+    else:
+        result_day = None
+    
+    # Determining the Day Increment
+    if days_later == 0:
+        day_increment = ""
+    elif days_later == 1:
+        day_increment = " (next day)"
+    else:
+        day_increment = f" ({days_later} days later)"
+    
+    # Formating the Result
+    if result_day:
+        new_time = f"{display_hour}:{final_minute:02d} {display_period}, {result_day}{day_increment}"
+    else:
+        new_time = f"{display_hour}:{final_minute:02d} {display_period}{day_increment}"
+
+    return new_time
+
+print(add_time('3:00 PM', '3:10'))
+print(add_time('11:30 AM', '2:32', 'Monday'))
+print(add_time('11:43 AM', '00:20'))
+print(add_time('10:10 PM', '3:30'))
+print(add_time('11:43 PM', '24:20', 'Tuesday'))
+print(add_time('6:30 PM', '205:12'))
